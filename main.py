@@ -27,7 +27,7 @@ stt_button.js_on_event("button_click", CustomJS(code="""
     """))
 
 layout = column(stt_button)
-
+st.write('Hello')
 result = streamlit_bokeh_events(
     st.bokeh_chart(layout),
     events="GET_TEXT",
