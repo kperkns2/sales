@@ -14,7 +14,7 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = str(google_cred)
 # Set up Google APIs
 from google.cloud import texttospeech
 from google.cloud import speech_v1p1beta1 as speech
-from google.cloud.speech_v1p1beta1 import enums
+from google.cloud.speech_v1p1beta1 import types
 
 
 
@@ -53,7 +53,7 @@ def main():
         # Use speech-to-text API to decode user's response
         with st.spinner('Listening...'):
             config = speech.RecognitionConfig(
-                encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+                encoding=types.RecognitionConfig.AudioEncoding.LINEAR16,
                 sample_rate_hertz=16000,
                 language_code="en-US",
             )
