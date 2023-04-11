@@ -25,9 +25,8 @@ stt_js = CustomJS(code="""
     recognition.start();
     """)
 
-# Create a Bokeh Div widget and attach the JavaScript code to it
-div = Div(text='<button style="width:100px;" onclick="execute_js()">Speak</button>', width=100)
-div.js_on_event("execute_js", stt_js)
+# Create a Bokeh Div widget and attach the JavaScript code to it using onclick attribute
+div = Div(text=f'<button style="width:100px;" onclick="{stt_js.code}">Speak</button>', width=100)
 
 result = streamlit_bokeh_events(
     div,
