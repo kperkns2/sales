@@ -16,10 +16,11 @@ from google.cloud import texttospeech
 from google.cloud import speech_v1p1beta1 as speech
 from google.cloud.speech_v1p1beta1 import types
 
-
+st.write('hi')
 
 # Streamlit app
 def main():
+    st.write('hello')
     # Set up Google text-to-speech API
     client = texttospeech.TextToSpeechClient()
     
