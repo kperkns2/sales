@@ -1,16 +1,15 @@
 
 import streamlit as st
-from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 
-stt_button = Button(label="Speak", width=100)
+st.write("Note: This app uses the SpeechRecognition API, which might not work on some hosted environments.")
 
-stt_button.js_on_event("button_click", CustomJS(code="""
+stt_js = CustomJS(code="""
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
- 
+
     recognition.onresult = function (e) {
         var value = "";
         for (var i = e.resultIndex; i < e.results.length; ++i) {
@@ -23,14 +22,16 @@ stt_button.js_on_event("button_click", CustomJS(code="""
         }
     }
     recognition.start();
-    """))
+    """)
+
+if st.button("Speak"):
+    stt_js.execute()
 
 result = streamlit_bokeh_events(
-    stt_button,
+    None,
     events="GET_TEXT",
     key="listen",
     refresh_on_update=False,
-    override_height=75,
     debounce_time=0)
 
 if result:
