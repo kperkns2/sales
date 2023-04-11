@@ -96,3 +96,5 @@ def main():
                         # Convert the agent's message to speech using the Text-to-Speech API
                         audio_content = synthesize_speech(response, language_code)
                         play_audio(audio_content)
+
+main()
