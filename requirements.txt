@@ -1,4 +1,4 @@
 google-cloud-speech
 google-cloud-texttospeech
-bokeh==2.0.2
+bokeh==2.2.3
 streamlit-bokeh-events
