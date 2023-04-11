@@ -3,7 +3,6 @@ import streamlit as st
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
-from bokeh.layouts import column
 
 stt_button = Button(label="Speak", width=100)
 
@@ -26,10 +25,8 @@ stt_button.js_on_event("button_click", CustomJS(code="""
     recognition.start();
     """))
 
-layout = column(stt_button)
-st.write('Hello')
 result = streamlit_bokeh_events(
-    st.bokeh_chart(layout),
+    stt_button,
     events="GET_TEXT",
     key="listen",
     refresh_on_update=False,
@@ -39,4 +36,3 @@ result = streamlit_bokeh_events(
 if result:
     if "GET_TEXT" in result:
         st.write(result.get("GET_TEXT"))
-
