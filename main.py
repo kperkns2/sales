@@ -3,13 +3,21 @@ import requests
 import json
 import time
 import os
+import tempfile
 
 google_cred = {}
 for k in ['type', 'project_id', 'private_key_id', 'private_key', 'client_email', 'client_id', 'auth_uri', 'token_uri', 'auth_provider_x509_cert_url', 'client_x509_cert_url']:
   google_cred[k] = st.secrets[k]
 
+def create_temp_credential_file(credential_dict):
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp:
+        temp.write(json.dumps(credential_dict).encode('utf-8'))
+        temp.flush()
+    return temp.name
+temp_credential_path = create_temp_credential_file(google_cred)
+
 # Google Cloud credentials
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = str(google_cred)
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_credential_path
 
 # Set up Google APIs
 from google.cloud import texttospeech
