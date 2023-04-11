@@ -1,31 +1,37 @@
-import streamlit as st
-from streamlit.components.v1 import declare_component
-import os
+from speech_to_text import speech_to_text
 
-_RELEASE = False
+def transcribe_audio(audio_data, language="en-US"):
+    client = speech.SpeechClient()
 
-if _RELEASE:
-    _component_func = declare_component(
-        "speech_to_text_component",
-        url="https://your-deployed-component-url",
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code=language,
     )
-else:
-    _component_func = declare_component("speech_to_text_component", path="speech_to_text_component")
+    audio = speech.RecognitionAudio(content=audio_data)
 
+    response = client.recognize(config=config, audio=audio)
+    transcription = ""
 
-def speech_to_text(key=None):
-    return _component_func(key=key)
+    for result in response.results:
+        transcription += result.alternatives[0].transcript
 
+    return transcription
 
-if __name__ == "__main__":
-    st.set_page_config(page_title="Speech to Text", layout="wide")
-    st.title("Speech to Text")
+st.set_page_config(page_title="Speech to Text", layout="wide")
+st.title("Speech to Text")
 
-    with st.form(key="my_form"):
-        st.write("Press and hold the button while speaking:")
-        transcription = speech_to_text()
+with st.form(key="my_form"):
+    st.write("Press and hold the button while speaking:")
+    audio_base64 = speech_to_text()
+    
+    if audio_base64:
+        st.write("Processing the audio...")
+        audio_data = base64.b64decode(audio_base64.split(",")[1])
+        transcription = transcribe_audio(audio_data)
         st.write("Transcription:", transcription)
-
+        
         submit_button = st.form_submit_button(label="Submit")
         if submit_button:
             st.write("You submitted:", transcription)
+

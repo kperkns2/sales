@@ -1,33 +1,47 @@
 import { Streamlit, ComponentMessageType } from "streamlit-component-lib";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const SpeechToText = () => {
+  const mediaRecorder = useRef(null);
+
   useEffect(() => {
     Streamlit.setFrameHeight();
-  });
+  }, []);
 
-  const handleSpeechToText = () => {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+  const handleStartRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder.current = new MediaRecorder(stream);
+    const audioChunks = [];
 
-    recognition.start();
+    mediaRecorder.current.addEventListener("dataavailable", (event) => {
+      audioChunks.push(event.data);
+    });
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      Streamlit.setComponentValue(transcript);
-    };
+    mediaRecorder.current.addEventListener("stop", () => {
+      const audioBlob = new Blob(audioChunks);
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = () => {
+        const base64data = reader.result;
+        Streamlit.setComponentValue(base64data);
+      };
+    });
 
-    recognition.onspeechend = () => {
-      recognition.stop();
-    };
+    mediaRecorder.current.start();
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+    }
   };
 
   return (
-    <button onClick={handleSpeechToText} type="button">
-      Press and hold to speak
-    </button>
+    <div>
+      <button onMouseDown={handleStartRecording} onMouseUp={handleStopRecording} type="button">
+        Press and hold to speak
+      </button>
+    </div>
   );
 };
 
