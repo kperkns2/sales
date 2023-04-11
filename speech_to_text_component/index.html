@@ -1,34 +1,14 @@
-import { Streamlit, ComponentMessageType } from "streamlit-component-lib";
-import { useEffect } from "react";
-
-const SpeechToText = () => {
-  useEffect(() => {
-    Streamlit.setFrameHeight();
-  });
-
-  const handleSpeechToText = () => {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.start();
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      Streamlit.setComponentValue(transcript);
-    };
-
-    recognition.onspeechend = () => {
-      recognition.stop();
-    };
-  };
-
-  return (
-    <button onClick={handleSpeechToText} type="button">
-      Press and hold to speak
-    </button>
-  );
-};
-
-export default SpeechToText;
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speech to Text Component</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/streamlit-component-lib@0.1.1/dist/streamlit-component-lib.umd.production.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
