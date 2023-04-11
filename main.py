@@ -10,7 +10,7 @@ if _RELEASE:
         url="https://your-deployed-component-url",
     )
 else:
-    _component_func = declare_component("speech_to_text_component", path=".")
+    _component_func = declare_component("speech_to_text_component", path="speech_to_text_component")
 
 
 def speech_to_text(key=None):
