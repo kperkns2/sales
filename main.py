@@ -1,38 +1,38 @@
+
 import streamlit as st
-from speech_to_text import speech_to_text
+from bokeh.models.widgets import Button
+from bokeh.models import CustomJS
+from streamlit_bokeh_events import streamlit_bokeh_events
 
-def transcribe_audio(audio_data, language="en-US"):
-    client = speech.SpeechClient()
+stt_button = Button(label="Speak", width=100)
 
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=16000,
-        language_code=language,
-    )
-    audio = speech.RecognitionAudio(content=audio_data)
+stt_button.js_on_event("button_click", CustomJS(code="""
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+ 
+    recognition.onresult = function (e) {
+        var value = "";
+        for (var i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) {
+                value += e.results[i][0].transcript;
+            }
+        }
+        if ( value != "") {
+            document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
+        }
+    }
+    recognition.start();
+    """))
 
-    response = client.recognize(config=config, audio=audio)
-    transcription = ""
+result = streamlit_bokeh_events(
+    stt_button,
+    events="GET_TEXT",
+    key="listen",
+    refresh_on_update=False,
+    override_height=75,
+    debounce_time=0)
 
-    for result in response.results:
-        transcription += result.alternatives[0].transcript
-
-    return transcription
-
-st.set_page_config(page_title="Speech to Text", layout="wide")
-st.title("Speech to Text")
-
-with st.form(key="my_form"):
-    st.write("Press and hold the button while speaking:")
-    audio_base64 = speech_to_text()
-    
-    if audio_base64:
-        st.write("Processing the audio...")
-        audio_data = base64.b64decode(audio_base64.split(",")[1])
-        transcription = transcribe_audio(audio_data)
-        st.write("Transcription:", transcription)
-        
-        submit_button = st.form_submit_button(label="Submit")
-        if submit_button:
-            st.write("You submitted:", transcription)
-
+if result:
+    if "GET_TEXT" in result:
+        st.write(result.get("GET_TEXT"))
