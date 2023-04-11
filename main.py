@@ -1,3 +1,4 @@
+import streamlit as st
 from speech_to_text import speech_to_text
 
 def transcribe_audio(audio_data, language="en-US"):
