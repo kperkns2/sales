@@ -1,5 +1,6 @@
 
 import streamlit as st
+from bokeh.models.widgets import Div
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 
@@ -24,11 +25,12 @@ stt_js = CustomJS(code="""
     recognition.start();
     """)
 
-if st.button("Speak"):
-    stt_js.execute()
+# Create a Bokeh Div widget and attach the JavaScript code to it
+div = Div(text='<button style="width:100px;" onclick="execute_js()">Speak</button>', width=100)
+div.js_on_event("execute_js", stt_js)
 
 result = streamlit_bokeh_events(
-    None,
+    div,
     events="GET_TEXT",
     key="listen",
     refresh_on_update=False,
