@@ -3,3 +3,5 @@ gspread-dataframe
 oauth2client
 openai==0.27.0
 plotly
+streamlit-bokeh-events
+pip install bokeh
