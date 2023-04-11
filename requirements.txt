@@ -1,11 +1,3 @@
-gspread
-gspread-dataframe
-oauth2client
-openai==0.27.0
-plotly
-google
-google-cloud
 google-cloud-speech
 google-cloud-texttospeech
-streamlit-bokeh-events
-bokeh
+pyaudio

@@ -1,108 +1,98 @@
 import streamlit as st
-import requests
-import json
-import time
+import pyaudio
+import io
 import os
-import tempfile
-
-google_cred = {}
-for k in ['type', 'project_id', 'private_key_id', 'private_key', 'client_email', 'client_id', 'auth_uri', 'token_uri', 'auth_provider_x509_cert_url', 'client_x509_cert_url']:
-  google_cred[k] = st.secrets[k]
-
-def create_temp_credential_file(credential_dict):
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp:
-        temp.write(json.dumps(credential_dict).encode('utf-8'))
-        temp.flush()
-    return temp.name
-temp_credential_path = create_temp_credential_file(google_cred)
-
-# Google Cloud credentials
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_credential_path
-
-# Set up Google APIs
-from google.cloud import texttospeech
 from google.cloud import speech_v1p1beta1 as speech
-from google.cloud.speech_v1p1beta1 import types
+from google.cloud import texttospeech_v1 as tts
 
-st.write('hi')
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'path/to/your/credentials.json'
 
-# Streamlit app
-def main():
-    st.write('hello')
-    # Set up Google text-to-speech API
-    client = texttospeech.TextToSpeechClient()
-    
-    # Set up Google speech-to-text API
-    client_stt = speech.SpeechClient()
+# Initialize the Google Speech client
+speech_client = speech.SpeechClient()
 
-    # Set up Streamlit app
-    st.title("Real-time chat with Google APIs")
+# Initialize the Google Text-to-Speech client
+tts_client = tts.TextToSpeechClient()
 
-    # Display initial prompt and read it using text-to-speech API
-    prompt = "Welcome to the chat. Please say something."
-    st.write("Agent: " + prompt)
-    with st.spinner('Loading audio...'):
-        synthesis_input = texttospeech.SynthesisInput(text=prompt)
-        voice = texttospeech.VoiceSelectionParams(
-            language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
-        )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3
-        )
-        response = client.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
-        )
-        with open("output.mp3", "wb") as out:
-            out.write(response.audio_content)
-        os.system("afplay output.mp3")
 
-    # Real-time chat loop
-    conversation = []
-    while True:
-        # Use speech-to-text API to decode user's response
-        with st.spinner('Listening...'):
-            config = speech.RecognitionConfig(
-                encoding=types.RecognitionConfig.AudioEncoding.LINEAR16,
-                sample_rate_hertz=16000,
-                language_code="en-US",
-            )
-            streaming_config = speech.StreamingRecognitionConfig(
-                config=config, interim_results=True
-            )
+def record_audio():
+    CHUNK = 1024
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 16000
+    RECORD_SECONDS = 5
 
-            def request_generator():
-                yield speech.StreamingRecognizeRequest(
-                    streaming_config=speech.StreamingRecognitionConfig(config=config, interim_results=True)
-                )
-                while True:
-                    time.sleep(0.1)
-                    data = {"audio": []}
-                    while st._is_running:
-                        if st.session_state.record:
-                            data["audio"].append(st.session_state.record.pop(0))
-                        else:
-                            break
-                    if not data["audio"]:
-                        st.warning("No audio detected. Please try again.")
-                    else:
-                        # Decode the audio to text using the Speech-to-Text API
-                        audio_data = data["audio"].getvalue()
-                        text = transcribe_speech(audio_data, language_code)
+    p = pyaudio.PyAudio()
 
-                        # Add the user's message to the conversation history
-                        conversation.append(('user', text))
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
 
-                        # Generate a response using the conversation history
-                        response = generate_response(conversation)
+    frames = []
 
-                        # Add the agent's message to the conversation history
-                        conversation.append(('agent', response))
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        frames.append(data)
 
-                        # Display the agent's message to the user
-                        st.write("AI: ", response)
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
 
-                        # Convert the agent's message to speech using the Text-to-Speech API
-                        audio_content = synthesize_speech(response, language_code)
-                        play_audio(audio_content)
+    return b''.join(frames)
 
-main()
+
+def transcribe_audio(audio_data):
+    audio = speech.RecognitionAudio(content=audio_data)
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,
+        language_code="en-US",
+    )
+
+    response = speech_client.recognize(config=config, audio=audio)
+
+    return response.results[0].alternatives[0].transcript
+
+
+def synthesize_speech(text):
+    input_text = tts.SynthesisInput(text=text)
+    voice = tts.VoiceSelectionParams(
+        language_code="en-US", ssml_gender=tts.SsmlVoiceGender.FEMALE
+    )
+    audio_config = tts.AudioConfig(
+        audio_encoding=tts.AudioEncoding.MP3
+    )
+
+    response = tts_client.synthesize_speech(
+        input=input_text, voice=voice, audio_config=audio_config
+    )
+
+    return response.audio_content
+
+
+def play_audio(audio_data):
+    p = pyaudio.PyAudio()
+    stream = p.open(format=p.get_format_from_width(2),
+                    channels=1,
+                    rate=24000,
+                    output=True)
+    stream.write(audio_data)
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+
+st.title("Streamlit Chat with Google STT and TTS")
+
+if st.button("Start conversation"):
+    st.write("Please speak for 5 seconds...")
+
+    audio_data = record_audio()
+    transcript = transcribe_audio(audio_data)
+
+    st.write(f"You said: {transcript}")
+
+    response_text = f"You said: {transcript}"
+    response_audio = synthesize_speech(response_text)
+    play_audio(response_audio)
