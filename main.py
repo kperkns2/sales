@@ -1,11 +1,7 @@
-
 import streamlit as st
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
-from gtts import gTTS
-import tempfile
-
 
 stt_button = Button(label="Speak", width=100)
 
@@ -39,12 +35,16 @@ result = streamlit_bokeh_events(
 if result:
     if "GET_TEXT" in result:
         user_text = result.get("GET_TEXT")
-        response = f"you said {user_text}"
-        st.write(response)
+        st.text(user_text)
 
+tts_button = Button(label="Speak", width=100)
 
-        tts = gTTS(text=response, lang="en")
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
-            tts.save(f.name)
-            st.audio(f.name, format="audio/mp3")
+if user_text:
+    tts_button.js_on_event("button_click", CustomJS(code=f"""
+        var u = new SpeechSynthesisUtterance();
+        u.text = "You said {user_text}";
+        u.lang = 'en-US';
+        speechSynthesis.speak(u);
+        """))
 
+st.bokeh_chart(tts_button)
