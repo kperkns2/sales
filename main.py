@@ -39,17 +39,9 @@ if result:
         response = f"you said {user_text}"
         st.write(response)
 
-        st.markdown(f'<p id="tts-response" style="display:none;">{response}</p>', unsafe_allow_html=True)
 
-        st.markdown("""
-            <script>
-                function playTts() {
-                    var ttsResponse = document.getElementById("tts-response").textContent;
-                    var synth = window.speechSynthesis;
-                    var utterance = new SpeechSynthesisUtterance(ttsResponse);
-                    synth.speak(utterance);
-                }
-            </script>
-            <button onclick="playTts()">Play Audio</button>
-            """, unsafe_allow_html=True)
+        tts = gTTS(text=response, lang="en")
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
+            tts.save(f.name)
+            st.audio(f.name, format="audio/mp3")
 
