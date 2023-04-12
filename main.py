@@ -10,8 +10,10 @@ toggle_button = Button(label="Start Listening", width=100)
 toggle_button.js_on_event("button_click", CustomJS(code="""
     if (this.label == "Start Listening") {
         this.label = "Speak";
+        console.log('a')
     } else {
         this.label = "Start Listening"
+        console.log('b')
     }
     """))
 
