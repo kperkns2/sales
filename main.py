@@ -35,4 +35,18 @@ result = streamlit_bokeh_events(
 
 if result:
     if "GET_TEXT" in result:
-        st.write(result.get("GET_TEXT"))
+        user_text = result.get("GET_TEXT")
+        response = f"you said {user_text}"
+        st.write(response)
+
+        st.markdown(f'<p id="tts-response" style="display:none;">{response}</p>', unsafe_allow_html=True)
+
+        st.markdown("""
+            <script>
+                var ttsResponse = document.getElementById("tts-response").textContent;
+                var synth = window.speechSynthesis;
+                var utterance = new SpeechSynthesisUtterance(ttsResponse);
+                synth.speak(utterance);
+            </script>
+            """, unsafe_allow_html=True)
+
