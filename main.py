@@ -9,6 +9,7 @@ toggle_button = Button(label="Start Listening", width=100)
 
 toggle_button.js_on_event("button_click", CustomJS(code="""
     if (this.label == "Start Listening") {
+        this.label = "Speak";
         var recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
@@ -25,7 +26,7 @@ toggle_button.js_on_event("button_click", CustomJS(code="""
             }
         }
         recognition.start();
-        this.label = "Speak";
+        
     } else {
         var u = new SpeechSynthesisUtterance();
         u.text = "You said " + document.getElementById("user-text").innerText;
