@@ -3,6 +3,8 @@ from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
 
+st.write('<p id="user-text"></p>', unsafe_allow_html=True)
+
 toggle_button = Button(label="Start Listening", width=100)
 
 toggle_button.js_on_event("button_click", CustomJS(code="""
@@ -44,4 +46,4 @@ result = streamlit_bokeh_events(
 if result:
     if "GET_TEXT" in result:
         user_text = result.get("GET_TEXT")
-        st.write(f'<p id="user-text">{user_text}</p>', unsafe_allow_html=True)
+        st.write(f'<script>document.getElementById("user-text").innerText = "{user_text}";</script>', unsafe_allow_html=True)
