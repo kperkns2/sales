@@ -37,14 +37,14 @@ if result:
         user_text = result.get("GET_TEXT")
         st.text(user_text)
 
-tts_button = Button(label="Speak", width=100)
+        tts_button = Button(label="Speak", width=100)
 
-if user_text:
-    tts_button.js_on_event("button_click", CustomJS(code=f"""
-        var u = new SpeechSynthesisUtterance();
-        u.text = "You said {user_text}";
-        u.lang = 'en-US';
-        speechSynthesis.speak(u);
-        """))
+        if user_text:
+            tts_button.js_on_event("button_click", CustomJS(code=f"""
+                var u = new SpeechSynthesisUtterance();
+                u.text = "You said {user_text}";
+                u.lang = 'en-US';
+                speechSynthesis.speak(u);
+                """))
 
 st.bokeh_chart(tts_button)
