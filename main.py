@@ -5,7 +5,7 @@ import base64
 
 def get_audio_player(audio_data):
     audio_base64 = base64.b64encode(audio_data).decode()
-    return f'<audio autoplay controls src="data:audio/mp3;base64,{audio_base64}">'
+    return f'<audio autoplay visibility="hidden" controls src="data:audio/mp3;base64,{audio_base64}">'
 
 def text_to_speech(text):
     tts = gTTS(text=text, lang='en')
