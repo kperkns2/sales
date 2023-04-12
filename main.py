@@ -1,3 +1,4 @@
+
 import streamlit as st
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
@@ -5,11 +6,11 @@ from streamlit_bokeh_events import streamlit_bokeh_events
 
 stt_button = Button(label="Speak", width=100)
 
-stt_button.js_on_event("button_press", CustomJS(code="""
+stt_button.js_on_event("button_click", CustomJS(code="""
     var recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-
+ 
     recognition.onresult = function (e) {
         var value = "";
         for (var i = e.resultIndex; i < e.results.length; ++i) {
@@ -22,10 +23,6 @@ stt_button.js_on_event("button_press", CustomJS(code="""
         }
     }
     recognition.start();
-    """))
-
-stt_button.js_on_event("button_release", CustomJS(code="""
-    recognition.stop();
     """))
 
 result = streamlit_bokeh_events(
@@ -55,3 +52,4 @@ if result:
             </script>
             <button onclick="playTts()">Play Audio</button>
             """, unsafe_allow_html=True)
+
