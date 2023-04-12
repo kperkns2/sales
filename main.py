@@ -1,53 +1,23 @@
 import streamlit as st
-from bokeh.models.widgets import Button
-from bokeh.models import CustomJS
-from streamlit_bokeh_events import streamlit_bokeh_events
+from gtts import gTTS
+from tempfile import NamedTemporaryFile
+import base64
 
-toggle_button = Button(label="Start Listening", width=100)
+def get_audio_player(audio_data):
+    audio_base64 = base64.b64encode(audio_data).decode()
+    return f'<audio controls src="data:audio/mp3;base64,{audio_base64}">'
 
-toggle_button.js_on_event("button_click", CustomJS(code="""
-    var state_element = document.getElementById("state");
+def text_to_speech(text):
+    tts = gTTS(text=text, lang='en')
+    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+        tts.save(tmp_file.name)
+        audio_data = open(tmp_file.name, "rb").read()
+    return audio_data
 
-    if (state_element.value === "start_listening") {
-        var recognition = new webkitSpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+st.title('Text-to-Speech App')
 
-        recognition.onresult = function (e) {
-            var value = "";
-            for (var i = e.resultIndex; i < e.results.length; ++i) {
-                if (e.results[i].isFinal) {
-                    value += e.results[i][0].transcript;
-                }
-            }
-            if (value != "") {
-                document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
-            }
-        }
-        recognition.start();
-        state_element.value = "speak";
-        this.label = "Speak";
-    } else {
-        var u = new SpeechSynthesisUtterance();
-        u.text = "You said " + document.getElementById("user-text").innerText;
-        u.lang = 'en-US';
-        speechSynthesis.speak(u);
-        state_element.value = "start_listening";
-        this.label = "Start Listening";
-    }
-    """))
-
-st.write('<input type="hidden" id="state" value="start_listening">', unsafe_allow_html=True)
-
-result = streamlit_bokeh_events(
-    toggle_button,
-    events="GET_TEXT",
-    key="listen",
-    refresh_on_update=False,
-    override_height=75,
-    debounce_time=0)
-
-if result:
-    if "GET_TEXT" in result:
-        user_text = result.get("GET_TEXT")
-        st.write(f'<p id="user-text">{user_text}</p>', unsafe_allow_html=True)
+user_input = st.text_input('Enter text to be spoken:')
+if user_input:
+    audio_data = text_to_speech(user_input)
+    audio_player = get_audio_player(audio_data)
+    st.write(audio_player, unsafe_allow_html=True)
