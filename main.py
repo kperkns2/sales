@@ -14,7 +14,6 @@ gc = gspread.authorize(credentials)
 spreadsheet = gc.open_by_key(st.secrets['sales_sheet'])
 
 # Load all assignements
-@st.cache_data
 def get_prompts_as_dataframe(key='prompts'):
     global spreadsheet
     worksheet = spreadsheet.worksheet(key)
