@@ -1,25 +1,41 @@
 import streamlit as st
-from gtts import gTTS
-from tempfile import NamedTemporaryFile
-import base64
+import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import json 
+from chatbot import chatbot, chatbot_select
+st.set_page_config(layout="wide",page_title="Mock Sale",page_icon="🤑")
 
-def get_audio_player(audio_data):
-    audio_base64 = base64.b64encode(audio_data).decode()
-    return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
+# Set up credentials to access the Google Sheet
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+cred = json.loads(st.secrets['sheets_cred'], strict=False)
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(cred, scope)
+gc = gspread.authorize(credentials)
+spreadsheet = gc.open_by_key(st.secrets['sales_sheet'])
 
-def text_to_speech(text):
-    
-    tts = gTTS(text=text, lang='en')
-    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
-        tts.save(tmp_file.name)
-        audio_data = open(tmp_file.name, "rb").read()
-    audio_player = get_audio_player(audio_data)
-    st.write(audio_player, unsafe_allow_html=True)
+# Load all assignements
+@st.cache_data
+def get_prompts_as_dataframe(key='prompts'):
+    global spreadsheet
+    worksheet = spreadsheet.worksheet(key)
+    # Get all records from the worksheet
+    records = worksheet.get_all_records()
+    # Convert the records to a pandas DataFrame
+    df = pd.DataFrame(records)
+    return df
 
-st.title('Text-to-Speech App')
 
-user_input = st.text_input('Enter text to be spoken:')
-if user_input:
-    text_to_speech(user_input)
+qp = st.experimental_get_query_params()
+if 'assignment_id' in qp:
+  assignment_id = str(qp['assignment_id'][0]).zfill(3)
+else:
+  assignment_id = 0
+
+df_activities = get_prompts_as_dataframe(key='prompts')
+df_activities['assignment_id'] = df_activities['assignment_id'].apply(lambda i: str(i).zfill(3))
+df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
+course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = df_activities
+chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
+ 
     
     
