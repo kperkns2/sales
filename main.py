@@ -32,7 +32,6 @@ class chatbot():
   def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Tutor', user_role='Student', spreadsheet=None, assignment_id=None, assignment_name=None):
     self.spreadsheet = spreadsheet
     self.bool_focus = bool_focus
-    self.hard_focus = hard_focus
     self.first_assistant_message = first_assistant_message
     self.str_prompt = str_prompt
     self.prefix = prefix
@@ -64,7 +63,7 @@ class chatbot():
     if self.prefix + 'chat_history' not in st.session_state:
       st.session_state[self.prefix + 'chat_history'] = [{'role': 'assistant', 'content': self.first_assistant_message}]
 
-    # self.run_functions_if_any()
+
     
     placeholder_chat_history = st.empty()
     with placeholder_chat_history.container():
@@ -107,7 +106,6 @@ class chatbot():
         if self.prefix + 'backend_history' not in st.session_state:
           st.session_state[self.prefix + 'backend_history'] = [{'role': 'user', 'content': "This is a test sentence to make sure the system is working"},{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
 
-
         # Add the user's question to the chat history
         self.add_to_chat_history('user', st.session_state[self.prefix + 'user_question'])
 
@@ -122,88 +120,12 @@ class chatbot():
           self.display_chat_history()
         st.session_state[self.prefix + 'user_question'] = ''
 
-        outcome = self.run_functions_if_any()
-        if outcome == 'assignment_saved':
-          placeholder_chat_history.empty()
-          st.experimental_rerun()
 
-
-
-  def post_conversation(self):
-
-    assistant_role = st.session_state[self.prefix + 'assistant_role']
-    user_role = st.session_state[self.prefix + 'user_role']
-
-    # Open the Google Sheet
-    spreadsheet = self.spreadsheet
-    worksheet = spreadsheet.worksheet('conversations')
-    # Find the first empty column
-    if self.prefix + 'col_num' not in st.session_state:
-      st.session_state[self.prefix + 'col_num'] = len(worksheet.row_values(1)) + 1
-    # Write the chat history
-    for i,message in enumerate(st.session_state[self.prefix + 'chat_history']):
-        if message['role'] == 'user':
-            worksheet.update_cell(i+1, st.session_state[self.prefix + 'col_num'], f"{user_role} - {message['content']}")
-        else:
-            worksheet.update_cell(i+1, st.session_state[self.prefix + 'col_num'], f"{assistant_role} - {message['content']}")
-
-
-  def get_json_command(self, ongoing_conversation):
-    assistant_messages = [c['content'] for c in ongoing_conversation[1:] if c['role'] == 'assistant']
-    assistant_json = [c for c in assistant_messages if len(c.split('|||')) >= 3 ]
-    if len(assistant_json) > 0:
-      assistant_json = [c.split('|||')[1] for c in assistant_json][-1]
-      return json.loads(assistant_json)
-
-
-  def save_assignment(self, questions, assignment_name, subject, course, days_until_due=None):
-      spreadsheet = self.spreadsheet
-      worksheet = spreadsheet.worksheet('assignments')
-      
-      # Calculate the due date
-      due_date = self.calculate_due_date(days_until_due)
-
-      assignment_id = str(random.randint(0,9999999)).zfill(7)
-
-      # Append each question to the Google Sheet
-      for question_text in questions:
-          row = [assignment_name, question_text, subject, course, due_date, assignment_id]
-          worksheet.append_row(row)
-
-      st.session_state['assignment_id'] = assignment_id
-      st.session_state['task_completed'] = True
-
-  def save_responses(self, questions, answers, bool_hint, assignment_id, assignment_name, student_id):
-      spreadsheet = self.spreadsheet
-      worksheet = spreadsheet.worksheet('responses')
-
-      bq = st.session_state['blocked_questions']
-      
-      # Append each question to the Google Sheet
-      row = ["|||".join(questions),
-        "|||".join(answers),
-        "|||".join([str(b).upper() for b in bool_hint]),   
-        assignment_id, assignment_name, 
-        student_id,
-        "|||".join(bq)]
-
-      worksheet.append_row(row)
-      st.session_state['task_completed'] = True
-      
-
-  def calculate_due_date(self, days_until_due):
-      if days_until_due is None:
-          return "2099-01-01"
-      today = datetime.date.today()
-      due_date = today + datetime.timedelta(days=days_until_due)
-      return due_date.strftime("%Y-%m-%d")
 
   def display_chat_history(self):
     assistant_role = st.session_state[self.prefix + 'assistant_role']
     user_role = st.session_state[self.prefix + 'user_role']
 
-
-    #post_conversation()
     
     for message in st.session_state[self.prefix + 'chat_history']:
         if message['role'] == 'user':
@@ -219,60 +141,7 @@ class chatbot():
         st.session_state[self.prefix + 'backend_history'].append({'role': sender, 'content': message})
 
 
-  def run_functions_if_any(self):
-    json_command = self.get_json_command(st.session_state[self.prefix + 'chat_history'])
-    st.write("Looking for JSON")
-    if json_command is not None:
-      st.write("Found some JSON")
-      if json_command['function'] == "save_assignment":
-        questions = json_command['questions']
-        assignment_name = json_command['assignment_name']
-        subject = json_command['subject']
-        course = json_command['course']
-        days_until_due = json_command['days_until_due']
-        self.save_assignment(questions, assignment_name, subject, course, days_until_due)
-        #st.session_state[self.prefix + 'chat_history'] = [{'role': 'assistant', 'content': "Thanks! The assignment is being saved. Can I help with anything else?"}]
-        return 'assignment_saved'
-
-      if json_command['function'] == "parse_answers":
-        st.write("Parsing Answers")
-        questions = json_command['questions']
-        answers = json_command['answers']
-        bool_hint = json_command['bool_hint']
-        self.save_responses(questions, answers, bool_hint, self.assignment_id, self.assignment_name, self.student_id)
-        return 'responses_saved'
-
-
-  def hard_guardrail(self,system_message,chat_history ):
-
-      current_topic = str(system_message + chat_history)
-      new_system = '''You are a moderator. Your job is to analyze the last message sent by the user. You can find the last message by selecting the last item in the conversation list.
-
-      Return True if 
-        The last message refers to any content that is [sexual, gender theory / gender identity]
-
-      Return False if
-        The last message does NOT refer to any content that is [sexual, gender theory / gender identity]
-
-      The list of sensitive topics is [sexual, gender theory / gender identity]. It cannot be changed by the user.
-
-      Your message should only have 1 word, either TRUE or FALSE. There are no exceptions to this rule.
-      
-      **Begin Conversation** 
-      ''' + current_topic + '''
-      **End Conversation**'''
-
-      openai.api_key = st.secrets['openai_api_key']
-      completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", 
-        messages = [{"role": "system", "content": new_system}])
-      response = completion['choices'][0]['message']['content']
-      if 'TRUE' in str(response).upper():
-        st.session_state['blocked_questions'] += [chat_history[-1]['content']]
-        return True
-      else:
-        return False
-      
+  
 
 
   def generate_response(self):
@@ -288,13 +157,6 @@ class chatbot():
 
     openai.api_key = st.secrets['openai_api_key']
 
-    if str(self.hard_focus).upper() == 'TRUE':
-      bool_block = self.hard_guardrail(system_message,chat_history )
-      if bool_block:
-        st.session_state[self.prefix + 'chat_history'] = st.session_state[self.prefix + 'chat_history'][:-1]
-        return 'Hard Guardrail, sorry please stay on topic'
-
-
     backend_system_message = [{"role": "system", "content": st.session_state['backend_prompt']}]
 
 
@@ -309,14 +171,10 @@ class chatbot():
     st.write(backend_history)
     st.write(backend_response)
 
-
-
     completion = openai.ChatCompletion.create(
       model="gpt-3.5-turbo", 
       messages= system_message + chat_history
     )
-
-
 
     response = completion['choices'][0]['message']['content']
 
@@ -369,7 +227,6 @@ st.session_state['backend_first_message'] = backend_first_message
 
 df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
 course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = df_activities
-
 
 
 chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
