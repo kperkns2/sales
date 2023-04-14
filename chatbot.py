@@ -63,6 +63,9 @@ class chatbot():
     if self.prefix + 'chat_history' not in st.session_state:
       st.session_state[self.prefix + 'chat_history'] = [{'role': 'assistant', 'content': self.first_assistant_message}]
 
+    if self.prefix + 'backend_history' not in st.session_state:
+      st.session_state[self.prefix + 'backend_history'] = [{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
+
     # self.run_functions_if_any()
     
     placeholder_chat_history = st.empty()
@@ -209,6 +212,8 @@ class chatbot():
   # Create a function to add messages to the chat history
   def add_to_chat_history(self, sender, message):
       st.session_state[self.prefix + 'chat_history'].append({'role': sender, 'content': message})
+      if sender == 'user':
+        st.session_state[self.prefix + 'backend_history'].append({'role': sender, 'content': message})
 
 
   def run_functions_if_any(self):
@@ -275,6 +280,7 @@ class chatbot():
     if st.session_state[self.prefix + 'chat_history'][0]['role'] == 'user':
       st.session_state[self.prefix + 'chat_history'] = st.session_state[self.prefix + 'chat_history'][1:]
     chat_history = st.session_state[self.prefix + 'chat_history']
+    backend_history = st.session_state[self.prefix + 'backend_history']
 
 
     openai.api_key = st.secrets['openai_api_key']
@@ -284,6 +290,18 @@ class chatbot():
       if bool_block:
         st.session_state[self.prefix + 'chat_history'] = st.session_state[self.prefix + 'chat_history'][:-1]
         return 'Hard Guardrail, sorry please stay on topic'
+
+
+    backend_system_message = [{"role": "system", "content": st.session_state['backend_prompt']}]
+
+
+    backend_completion = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo", 
+      messages= backend_system_message + backend_history
+    )
+    backend_response = backend_completion['choices'][0]['message']['content']
+
+
 
     completion = openai.ChatCompletion.create(
       model="gpt-3.5-turbo", 
