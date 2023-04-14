@@ -304,7 +304,7 @@ class chatbot():
     )
     backend_response = backend_completion['choices'][0]['message']['content']
     
-    
+    st.write(st.session_state['backend_prompt'])
     st.write(backend_response)
 
 
