@@ -63,6 +63,7 @@ class chatbot():
     if self.prefix + 'chat_history' not in st.session_state:
       st.session_state[self.prefix + 'chat_history'] = [{'role': 'assistant', 'content': self.first_assistant_message}]
 
+    st.write(st.session_state['backend_first_message'])
     if self.prefix + 'backend_history' not in st.session_state:
       st.session_state[self.prefix + 'backend_history'] = [{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
       st.write(st.session_state[self.prefix + 'backend_history'])
