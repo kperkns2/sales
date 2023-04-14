@@ -105,7 +105,7 @@ class chatbot():
     if len(st.session_state[self.prefix + 'user_question']) > 0:
 
         if self.prefix + 'backend_history' not in st.session_state:
-          st.session_state[self.prefix + 'backend_history'] = [{'role': 'user', 'content': "This is a test sentence to make sure the system is working"}{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
+          st.session_state[self.prefix + 'backend_history'] = [{'role': 'user', 'content': "This is a test sentence to make sure the system is working"},{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
 
 
         # Add the user's question to the chat history
