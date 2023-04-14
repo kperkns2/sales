@@ -63,11 +63,6 @@ class chatbot():
     if self.prefix + 'chat_history' not in st.session_state:
       st.session_state[self.prefix + 'chat_history'] = [{'role': 'assistant', 'content': self.first_assistant_message}]
 
-    st.write(st.session_state['backend_first_message'])
-    if self.prefix + 'backend_history' not in st.session_state:
-      st.session_state[self.prefix + 'backend_history'] = [{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
-      st.write(st.session_state[self.prefix + 'backend_history'])
-
     # self.run_functions_if_any()
     
     placeholder_chat_history = st.empty()
@@ -107,6 +102,12 @@ class chatbot():
 
     # Handle user input
     if len(st.session_state[self.prefix + 'user_question']) > 0:
+
+        if self.prefix + 'backend_history' not in st.session_state:
+          st.session_state[self.prefix + 'backend_history'] = [{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
+          st.write(st.session_state[self.prefix + 'backend_history'])
+
+
         # Add the user's question to the chat history
         self.add_to_chat_history('user', st.session_state[self.prefix + 'user_question'])
 
@@ -302,7 +303,6 @@ class chatbot():
       messages= backend_system_message + backend_history
     )
     backend_response = backend_completion['choices'][0]['message']['content']
-    st.write(backend_system_message)
     st.write(backend_history)
     st.write(backend_response)
 
