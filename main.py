@@ -34,12 +34,19 @@ else:
 df_activities = get_prompts_as_dataframe(key='prompts')
 df_backend = df_activities[df_activities['assignment_id'] == 'backend'].iloc[0]
 _,_,_,_,_,backend_prompt,backend_first_message,_ = df_backend
+st.session_state['backend_prompt'] = backend_prompt
+st.session_state['backend_first_message'] = backend_first_message
+
+
+st.write(backend_prompt)
+st.write(backend_first_message)
+
+
 
 df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
 course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = df_activities
 
-st.session_state['backend_prompt'] = backend_prompt
-st.session_state['backend_first_message'] = backend_first_message
+
 
 chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
  
