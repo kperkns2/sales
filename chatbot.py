@@ -300,6 +300,7 @@ class chatbot():
       messages= backend_system_message + backend_history
     )
     backend_response = backend_completion['choices'][0]['message']['content']
+    st.write(backend_response)
 
 
 
