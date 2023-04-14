@@ -138,13 +138,9 @@ class chatbot():
         st.session_state[self.prefix + 'backend_history'].append({'role': sender, 'content': message})
 
 
-  
-
-
   def generate_response(self):
 
-    if len(self.str_prompt) > 2:
-      system_message = [{"role": "system", "content": self.str_prompt}]
+    
 
     if st.session_state[self.prefix + 'chat_history'][0]['role'] == 'user':
       st.session_state[self.prefix + 'chat_history'] = st.session_state[self.prefix + 'chat_history'][1:]
@@ -153,16 +149,17 @@ class chatbot():
 
 
     openai.api_key = st.secrets['openai_api_key']
-
     backend_system_message = [{"role": "system", "content": st.session_state['backend_prompt']}]
-
 
     backend_completion = openai.ChatCompletion.create(
       model="gpt-3.5-turbo", 
       messages= backend_system_message + backend_history
     )
+
+    
     backend_response = backend_completion['choices'][0]['message']['content']
     
+    system_message = [{"role": "system", "content": self.str_prompt + f"Here is the JSON object that determines if you need to say a Cut message {backend_response}"}]
 
     st.write(backend_system_message)
     st.write(backend_history)
