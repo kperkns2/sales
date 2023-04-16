@@ -163,6 +163,7 @@ class chatbot():
 
 
 def fetch_embedding(text, model="text-embedding-ada-002"):
+    OPENAI_API_KEY = st.secrets['openai_api_key']  
     url = "https://api.openai.com/v1/embeddings"
     headers = {
         "Content-Type": "application/json",
@@ -185,7 +186,7 @@ class sales_chatbot(chatbot):
     super().__init__(bool_focus, hard_focus, first_assistant_message, str_prompt, prefix)
 
   def on_user_message(self, user_message):
-    OPENAI_API_KEY = st.secrets['openai_api_key']   
+     
     input_sentence = user_message
     sentences_list = st.session_state['script_lines']
 
