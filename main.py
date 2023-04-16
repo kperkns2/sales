@@ -246,7 +246,7 @@ script_lines = df_script['NoAlarm'].values.tolist()
 st.session_state['script_lines'] = script_lines
 
 
-chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
+sales_chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
  
     
     
