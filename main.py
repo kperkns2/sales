@@ -19,8 +19,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-
- def clear_session_state():
+def clear_session_state():
     keys_to_delete = list(st.session_state.keys())
     for key in keys_to_delete:
         del st.session_state[key]
