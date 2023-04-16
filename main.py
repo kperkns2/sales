@@ -20,9 +20,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 def clear_session_state():
-    keys_to_delete = list(st.session_state.keys())
+  
+  keys_to_delete = list(st.session_state.keys())
+  try:
     for key in keys_to_delete:
         del st.session_state[key]
+  except:
+    pass
 
 def get_audio_player(audio_data):
     audio_base64 = base64.b64encode(audio_data).decode()
@@ -254,4 +258,7 @@ st.session_state['script_lines'] = script_lines
 sales_chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
 if st.button('Restart'):
   clear_session_state()
+  st.experimental_rerun()
+
+
     
