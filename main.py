@@ -108,14 +108,14 @@ class chatbot():
     # Handle user input
     if len(st.session_state[self.prefix + 'user_question']) > 0:
 
-        self.on_user_message(st.session_state[self.prefix + 'user_question'])
-
         # Add the user's question to the chat history
         self.add_to_chat_history('user', st.session_state[self.prefix + 'user_question'])
 
         with placeholder_chat_history.container():
           self.display_chat_history()
 
+        self.on_user_message(st.session_state[self.prefix + 'user_question'])
+        
         agent_response = self.generate_response()
         self.add_to_chat_history('assistant', agent_response)
 
