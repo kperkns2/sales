@@ -200,10 +200,6 @@ class sales_chatbot(chatbot):
     st.write(f"Most similar sentence: {most_similar_sentence}")
     st.write(f"Similarity: {similarities[0][most_similar_index]}")
 
-if __name__ == "__main__":
-    main()
-
-
   
 
 
