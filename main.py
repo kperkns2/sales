@@ -242,7 +242,7 @@ course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = 
 
 
 df_script = get_sheet_as_dataframe(key='script')
-script_lines = df_script['NoAlarm'].values.to_list()
+script_lines = df_script['NoAlarm'].values().to_list()
 st.session_state['script_lines'] = script_lines
 
 
