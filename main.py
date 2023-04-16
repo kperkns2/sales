@@ -13,13 +13,18 @@ import streamlit.components.v1 as components
 from gtts import gTTS
 from tempfile import NamedTemporaryFile
 import base64
+import requests
+import os
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+
 
 def get_audio_player(audio_data):
     audio_base64 = base64.b64encode(audio_data).decode()
     return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
 
 def text_to_speech(text):
-    
     tts = gTTS(text=text, lang='en')
     with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
         tts.save(tmp_file.name)
@@ -103,8 +108,7 @@ class chatbot():
     # Handle user input
     if len(st.session_state[self.prefix + 'user_question']) > 0:
 
-        if self.prefix + 'backend_history' not in st.session_state:
-          st.session_state[self.prefix + 'backend_history'] = [{'role': 'user', 'content': "This is a test sentence to make sure the system is working"},{'role': 'assistant', 'content': st.session_state['backend_first_message']}]
+        self.on_user_message(t.session_state[self.prefix + 'user_question'])
 
         # Add the user's question to the chat history
         self.add_to_chat_history('user', st.session_state[self.prefix + 'user_question'])
@@ -120,7 +124,11 @@ class chatbot():
           self.display_chat_history()
         st.session_state[self.prefix + 'user_question'] = ''
 
+  def on_user_message(self, user_message):
+    return
 
+  def on_agent_message(self, agent_message):
+    return  
 
   def display_chat_history(self):
     assistant_role = st.session_state[self.prefix + 'assistant_role']
@@ -134,36 +142,15 @@ class chatbot():
   # Create a function to add messages to the chat history
   def add_to_chat_history(self, sender, message):
       st.session_state[self.prefix + 'chat_history'].append({'role': sender, 'content': message})
-      if sender == 'user':
-        st.session_state[self.prefix + 'backend_history'].append({'role': sender, 'content': message})
 
 
   def generate_response(self):
-
-    
-
     if st.session_state[self.prefix + 'chat_history'][0]['role'] == 'user':
       st.session_state[self.prefix + 'chat_history'] = st.session_state[self.prefix + 'chat_history'][1:]
     chat_history = st.session_state[self.prefix + 'chat_history']
-    backend_history = st.session_state[self.prefix + 'backend_history']
-
 
     openai.api_key = st.secrets['openai_api_key']
-    backend_system_message = [{"role": "system", "content": st.session_state['backend_prompt']}]
-
-    backend_completion = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo", 
-      messages= backend_system_message + backend_history
-    )
-
-    
-    backend_response = backend_completion['choices'][0]['message']['content']
-    
-    system_message = [{"role": "system", "content": self.str_prompt + f"Here is the JSON object that determines if you need to say a Cut message {backend_response}"}]
-
-    st.write(backend_system_message)
-    st.write(backend_history)
-    st.write(backend_response)
+    system_message = [{"role": "system", "content": self.str_prompt}]
 
     completion = openai.ChatCompletion.create(
       model="gpt-3.5-turbo", 
@@ -171,10 +158,53 @@ class chatbot():
     )
 
     response = completion['choices'][0]['message']['content']
-
-
+    self.on_agent_message(response)
     return response
 
+
+def fetch_embedding(text, model="text-embedding-ada-002"):
+    url = "https://api.openai.com/v1/embeddings"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {OPENAI_API_KEY}"
+    }
+    data = {
+        "input": text,
+        "model": model
+    }
+    response = requests.post(url, json=data, headers=headers)
+    response.raise_for_status()
+    json_response = response.json()
+    embedding = json_response["data"][0]["embedding"]
+
+    return np.array(embedding)
+
+
+class sales_chatbot(chatbot):
+  def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Tutor', user_role='Student', spreadsheet=None, assignment_id=None, assignment_name=None):
+    super().__init__(bool_focus, hard_focus, first_assistant_message, str_prompt, prefix)
+
+  def on_user_message(self, user_message):
+    OPENAI_API_KEY = st.secrets['openai_api_key']   
+    input_sentence = user_message
+    sentences_list = st.session_state['script_lines']
+
+    input_embedding = fetch_embedding(input_sentence)
+    sentence_embeddings = np.array([fetch_embedding(sentence) for sentence in sentences_list])
+
+    similarities = cosine_similarity(input_embedding.reshape(1, -1), sentence_embeddings)
+    most_similar_index = np.argmax(similarities)
+    most_similar_sentence = sentences_list[most_similar_index]
+
+    st.write(f"Input sentence: {input_sentence}")
+    st.write(f"Most similar sentence: {most_similar_sentence}")
+    st.write(f"Similarity: {similarities[0][most_similar_index]}")
+
+if __name__ == "__main__":
+    main()
+
+
+  
 
 
 import streamlit as st
@@ -193,7 +223,7 @@ gc = gspread.authorize(credentials)
 spreadsheet = gc.open_by_key(st.secrets['sales_sheet'])
 
 # Load all assignements
-def get_prompts_as_dataframe(key='prompts'):
+def get_sheet_as_dataframe(key='prompts'):
     global spreadsheet
     worksheet = spreadsheet.worksheet(key)
     # Get all records from the worksheet
@@ -210,15 +240,14 @@ else:
   assignment_id = 'a0'
 
 
-df_activities = get_prompts_as_dataframe(key='prompts')
-df_backend = df_activities[df_activities['assignment_id'] == 'backend'].iloc[0]
-_,_,_,_,_,backend_prompt,backend_first_message,_ = df_backend
-st.session_state['backend_prompt'] = backend_prompt
-st.session_state['backend_first_message'] = backend_first_message
-
-
+df_activities = get_sheet_as_dataframe(key='prompts')
 df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
 course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = df_activities
+
+
+df_script = get_sheet_as_dataframe(key='script')
+script_lines = df_script['NoAlarm'].values.to_list()
+st.session_state['script_lines'] = script_lines
 
 
 chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
