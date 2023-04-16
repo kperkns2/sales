@@ -20,6 +20,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 
+ def clear_session_state():
+    keys_to_delete = list(st.session_state.keys())
+    for key in keys_to_delete:
+        del st.session_state[key]
+
 def get_audio_player(audio_data):
     audio_base64 = base64.b64encode(audio_data).decode()
     return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
@@ -115,7 +120,7 @@ class chatbot():
           self.display_chat_history()
 
         self.on_user_message(st.session_state[self.prefix + 'user_question'])
-        
+
         agent_response = self.generate_response()
         self.add_to_chat_history('assistant', agent_response)
 
@@ -248,6 +253,6 @@ st.session_state['script_lines'] = script_lines
 
 
 sales_chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
- 
-    
+if st.button('Restart'):
+  clear_session_state()
     
