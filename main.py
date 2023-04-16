@@ -108,7 +108,7 @@ class chatbot():
     # Handle user input
     if len(st.session_state[self.prefix + 'user_question']) > 0:
 
-        self.on_user_message(t.session_state[self.prefix + 'user_question'])
+        self.on_user_message(st.session_state[self.prefix + 'user_question'])
 
         # Add the user's question to the chat history
         self.add_to_chat_history('user', st.session_state[self.prefix + 'user_question'])
