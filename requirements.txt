@@ -7,3 +7,5 @@ gspread-dataframe
 oauth2client
 openai==0.27.0
 plotly
+scikit-learn
+numpy
