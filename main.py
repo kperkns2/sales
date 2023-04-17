@@ -227,7 +227,7 @@ def fetch_embedding(text, model="text-embedding-ada-002"):
 
 class sales_chatbot(chatbot):
   def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Homeowner', user_role='Sales Rep', spreadsheet=None, assignment_id=None, assignment_name=None):
-    super().__init__(bool_focus, hard_focus, first_assistant_message, str_prompt, prefix)
+    super().__init__(bool_focus, hard_focus, first_assistant_message, str_prompt, prefix, replace, assistant_role, user_role)
 
   def on_user_message(self, user_message):
      
