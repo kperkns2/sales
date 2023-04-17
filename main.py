@@ -166,7 +166,7 @@ class chatbot():
                     color: #ffffff;
                 }
                 .assistant-message {
-                    background-color: #4d4d4d;
+                    background-color: #8d8d8d;
                     border-color: #424242;
                     color: #ffffff;
                 }
