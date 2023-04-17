@@ -370,4 +370,7 @@ st.sidebar.title('Demo Chats')
 st.sidebar.subheader('Easy Sales')
 st.sidebar.markdown("[Without Alarm System](https://salesman.streamlit.app/?assignment_id=a0)")
 st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a1)")
+st.sidebar.subheader('Hard Sales')
+st.sidebar.markdown("[Without Alarm System](https://salesman.streamlit.app/?assignment_id=a2)")
+st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a3)")
     
