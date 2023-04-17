@@ -248,7 +248,7 @@ class sales_chatbot(chatbot):
 
     st.write(f"Input sentence: {input_sentence}")
     st.write(f"Most similar sentence: {most_similar_sentence}")
-    st.write(f"Similarity: {}")
+    st.write(f"Similarity: {similarity_score}")
 
   
 import streamlit as st
