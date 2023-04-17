@@ -141,12 +141,57 @@ class chatbot():
   def display_chat_history(self):
     assistant_role = st.session_state[self.prefix + 'assistant_role']
     user_role = st.session_state[self.prefix + 'user_role']
-    
-    for message in st.session_state[self.prefix + 'chat_history']:
-        if message['role'] == 'user':
-            st.markdown(f"<div style='background-color: white; padding: 10px; border-radius: 5px; white-space: pre-line;'><font color='black'><b>{user_role} - </b>{message['content']}</font></div>", unsafe_allow_html=True)
-        else:
-            st.markdown(f"<div style='background-color: #F7F7F7; padding: 10px; border-radius: 5px; border: 1px solid #DDDDDD; white-space: pre-line;'><font color='black'><b>{assistant_role} - </b>{message['content']}</font></div>", unsafe_allow_html=True)
+
+  st.markdown(
+      """
+      <style>
+          .chat-container {
+              padding: 10px;
+              border-radius: 5px;
+              white-space: pre-line;
+              margin-bottom: 10px;
+          }
+          .user-message {
+              background-color: #ffffff;
+              color: #000000;
+          }
+          .assistant-message {
+              background-color: #F7F7F7;
+              border: 1px solid #DDDDDD;
+              color: #000000;
+          }
+          @media (prefers-color-scheme: dark) {
+              .user-message {
+                  background-color: #1f1f1f;
+                  color: #ffffff;
+              }
+              .assistant-message {
+                  background-color: #2d2d2d;
+                  border-color: #424242;
+                  color: #ffffff;
+              }
+          }
+      </style>
+      """,
+      unsafe_allow_html=True,
+  )
+
+
+
+
+  for message in st.session_state[self.prefix + "chat_history"]:
+      if message["role"] == "user":
+          st.markdown(
+              f"<div class='chat-container user-message'><b>{user_role} - </b>{message['content']}</div>",
+              unsafe_allow_html=True,
+          )
+      else:
+          st.markdown(
+              f"<div class='chat-container assistant-message'><b>{assistant_role} - </b>{message['content']}</div>",
+              unsafe_allow_html=True,
+          )
+
+
   # Create a function to add messages to the chat history
   def add_to_chat_history(self, sender, message):
       st.session_state[self.prefix + 'chat_history'].append({'role': sender, 'content': message})
