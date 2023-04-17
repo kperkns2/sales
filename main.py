@@ -161,25 +161,15 @@ class chatbot():
                 margin-bottom: 10px;
             }
             .user-message {
-                background-color: #ffffff;
-                color: #000000;
+                background-color: #000000;
+                color: #ffffff;
             }
             .assistant-message {
-                background-color: #F7F7F7;
+                background-color: #2d2d2d;
                 border: 1px solid #DDDDDD;
-                color: #000000;
+                color: #ffffff;
             }
-            @media (prefers-color-scheme: dark) {
-                .user-message {
-                    background-color: #1f1f1f;
-                    color: #ffffff;
-                }
-                .assistant-message {
-                    background-color: #2d2d2d;
-                    border-color: #424242;
-                    color: #ffffff;
-                }
-            }
+            
         </style>
         """,
         unsafe_allow_html=True,
