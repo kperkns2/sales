@@ -249,7 +249,7 @@ class sales_chatbot(chatbot):
       similarity_score = similarity_score * (size_ratio / .9) 
 
     if size_ratio > 1.1:
-        input_embedding_shortened = fetch_embedding(' '.join(input_sentence.split(' ')[-similar_sentence_length:]))
+        input_embedding_shortened = fetch_embedding(' '.join(input_sentence.split(' ')[-(similar_sentence_length + 4):]))
         similarities = cosine_similarity(input_embedding_shortened.reshape(1, -1), sentence_embeddings)
         max_similarity = np.max(similarities)
         similarity_score = np.max([similarity_score, max_similarity])
