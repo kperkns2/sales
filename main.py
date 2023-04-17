@@ -269,7 +269,7 @@ class sales_chatbot(chatbot):
         super().__init__(bool_focus, 'FALSE', first_assistant_message, str_prompt, prefix, replace, assistant_role, user_role)
         if 'sentence_status' not in st.session_state:
           st.session_state['sentence_status'] = ['red'] * len(st.session_state['script_lines'])
-        self.update_status_bar()
+          self.update_status_bar()
 
     def update_status_bar(self):
         status_bar_html = "<div style='display: flex; flex-wrap: wrap;'>"
