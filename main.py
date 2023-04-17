@@ -241,13 +241,16 @@ class sales_chatbot(chatbot):
     most_similar_index = np.argmax(similarities)
     most_similar_sentence = sentences_list[most_similar_index]
 
+    similarity_score = similarities[0][most_similar_index]
+    size_ratio = (len(input_sentence.split(' ')) / len(most_similar_sentence.split(' '))) 
+    if size_ratio < .9:
+      similarity_score = similarity_score * (size_ratio / .9) 
+
     st.write(f"Input sentence: {input_sentence}")
     st.write(f"Most similar sentence: {most_similar_sentence}")
-    st.write(f"Similarity: {similarities[0][most_similar_index]}")
+    st.write(f"Similarity: {}")
 
   
-
-
 import streamlit as st
 import pandas as pd
 import gspread
