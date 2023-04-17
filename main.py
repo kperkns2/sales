@@ -272,12 +272,13 @@ class sales_chatbot(chatbot):
           self.update_status_bar()
 
     def update_status_bar(self):
+        
         status_bar_html = "<div style='display: flex; flex-wrap: wrap;'>"
         for status in st.session_state['sentence_status']:
             status_bar_html += f"<div style='background-color: {status}; width: 20px; height: 20px; margin: 2px;'></div>"
         status_bar_html += "</div>"
 
-        st.markdown(status_bar_html, unsafe_allow_html=True)
+        st.markdown("Here's your current status: " + status_bar_html, unsafe_allow_html=True)
 
     def on_user_message(self, user_message):
         input_sentence = user_message
@@ -308,7 +309,14 @@ class sales_chatbot(chatbot):
         elif 0.85 <= similarity_score < 0.95:
             st.session_state['sentence_status'][most_similar_index] = 'orange'
 
+        
+
+
         self.update_status_bar()
+
+        st.write(f"Input sentence: {input_sentence}")
+        st.write(f"Most similar sentence: {most_similar_sentence}")
+        st.write(f"Similarity: {similarity_score}")
 
   
 import streamlit as st
