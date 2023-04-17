@@ -259,6 +259,57 @@ class sales_chatbot(chatbot):
     st.write(f"Most similar sentence: {most_similar_sentence}")
     st.write(f"Similarity: {similarity_score}")
 
+
+import streamlit as st
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+class sales_chatbot(chatbot):
+    def __init__(self, bool_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Homeowner', user_role='Sales Rep', spreadsheet=None, assignment_id=None, assignment_name=None):
+        super().__init__(bool_focus, 'FALSE', first_assistant_message, str_prompt, prefix, replace, assistant_role, user_role)
+        if 'sentence_status' not in st.session_state:
+          st.session_state['sentence_status'] = ['red'] * len(st.session_state['script_lines'])
+        self.update_status_bar()
+
+    def update_status_bar(self):
+        status_bar_html = "<div style='display: flex; flex-wrap: wrap;'>"
+        for status in st.session_state['sentence_status']:
+            status_bar_html += f"<div style='background-color: {status}; width: 20px; height: 20px; margin: 2px;'></div>"
+        status_bar_html += "</div>"
+
+        st.markdown(status_bar_html, unsafe_allow_html=True)
+
+    def on_user_message(self, user_message):
+        input_sentence = user_message
+        sentences_list = st.session_state['script_lines']
+
+        input_embedding = fetch_embedding(input_sentence)
+        sentence_embeddings = np.array([fetch_embedding(sentence) for sentence in sentences_list])
+
+        similarities = cosine_similarity(input_embedding.reshape(1, -1), sentence_embeddings)
+        most_similar_index = np.argmax(similarities)
+        most_similar_sentence = sentences_list[most_similar_index]
+
+        similarity_score = similarities[0][most_similar_index]
+        similar_sentence_length = len(most_similar_sentence.split(' '))
+
+        size_ratio = (len(input_sentence.split(' ')) / similar_sentence_length) 
+        if size_ratio < .9:
+            similarity_score = similarity_score * (size_ratio / .9) 
+
+        if size_ratio > 1.1:
+            input_embedding_shortened = fetch_embedding(' '.join(input_sentence.split(' ')[-(similar_sentence_length + 4):]))
+            similarities = cosine_similarity(input_embedding_shortened.reshape(1, -1), sentence_embeddings)
+            max_similarity = np.max(similarities)
+            similarity_score = np.max([similarity_score, max_similarity])
+
+        if similarity_score >= 0.95:
+            st.session_state['sentence_status'][most_similar_index] = 'green'
+        elif 0.85 <= similarity_score < 0.95:
+            st.session_state['sentence_status'][most_similar_index] = 'orange'
+
+        self.update_status_bar()
+
   
 import streamlit as st
 import pandas as pd
