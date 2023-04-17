@@ -160,16 +160,7 @@ class chatbot():
                 border: 1px solid #DDDDDD;
                 color: #000000;
             }
-            @media (prefers-color-scheme: dark) {
-                .user-message {
-                    background-color: #1f1f1f;
-                    color: #ffffff;
-                }
-                .assistant-message {
-                    background-color: #2d2d2d;
-                    border-color: #424242;
-                    color: #ffffff;
-                }
+
             }
         </style>
         """,
