@@ -226,8 +226,8 @@ def fetch_embedding(text, model="text-embedding-ada-002"):
 
 
 class sales_chatbot(chatbot):
-  def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Homeowner', user_role='Sales Rep', spreadsheet=None, assignment_id=None, assignment_name=None):
-    super().__init__(bool_focus, hard_focus, first_assistant_message, str_prompt, prefix, replace, assistant_role, user_role)
+  def __init__(self, bool_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Homeowner', user_role='Sales Rep', spreadsheet=None, assignment_id=None, assignment_name=None):
+    super().__init__(bool_focus, 'FALSE', first_assistant_message, str_prompt, prefix, replace, assistant_role, user_role)
 
   def on_user_message(self, user_message):
      
@@ -286,13 +286,13 @@ else:
 
 df_activities = get_sheet_as_dataframe(key='prompts')
 df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
-course,topic,subtopic,focus,hard_guardrail,prompt,first_message,assignment_id = df_activities
+course,topic,subtopic,focus,prompt,first_message,assignment_id = df_activities
 df_script = get_sheet_as_dataframe(key='script')
 script_lines = df_script[subtopic].values.tolist()
 st.session_state['script_lines'] = script_lines
 
 
-sales_chatbot(focus, hard_guardrail, first_message, prompt, prefix='activity_' )
+sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 if st.button('Restart'):
   clear_session_state()
   st.experimental_rerun()
