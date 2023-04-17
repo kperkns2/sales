@@ -278,7 +278,7 @@ class sales_chatbot(chatbot):
             status_bar_html += f"<div style='background-color: {status}; width: 20px; height: 20px; margin: 2px;'></div>"
         status_bar_html += "</div>"
 
-        st.markdown("Here's your current status: " + status_bar_html, unsafe_allow_html=True)
+        st.markdown("<div> Here's your current status: " + status_bar_html + "</div>", unsafe_allow_html=True)
 
     def on_user_message(self, user_message):
         input_sentence = user_message
@@ -314,9 +314,9 @@ class sales_chatbot(chatbot):
 
         self.update_status_bar()
 
-        st.write(f"Input sentence: {input_sentence}")
-        st.write(f"Most similar sentence: {most_similar_sentence}")
-        st.write(f"Similarity: {similarity_score}")
+        #st.write(f"Input sentence: {input_sentence}")
+        #st.write(f"Most similar sentence: {most_similar_sentence}")
+        st.write(f"Similarity: {np.round(similarity_score)}")
 
   
 import streamlit as st
