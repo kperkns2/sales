@@ -366,5 +366,5 @@ sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 #  clear_session_state()
 #  st.experimental_rerun()
 
-
+st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a1)")
     
