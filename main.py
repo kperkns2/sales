@@ -367,7 +367,7 @@ sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 #  st.experimental_rerun()
 
 st.sidebar.title('Demo Chats')
-st.sidebar.subtopic('Easy Sales')
+st.sidebar.subheader('Easy Sales')
 st.sidebar.markdown("[Without Alarm System](https://salesman.streamlit.app/?assignment_id=a0)")
 st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a1)")
     
