@@ -142,6 +142,15 @@ class chatbot():
     assistant_role = st.session_state[self.prefix + 'assistant_role']
     user_role = st.session_state[self.prefix + 'user_role']
 
+    pc = st.get_option('theme.primaryColor')
+    bc = st.get_option('theme.backgroundColor')
+    sbc = st.get_option('theme.secondaryBackgroundColor')
+    tc = st.get_option('theme.textColor')
+
+    st.write(pc, bc, sbc, tc)
+
+
+
     st.markdown(
         """
         <style>
@@ -166,7 +175,7 @@ class chatbot():
                     color: #ffffff;
                 }
                 .assistant-message {
-                    background-color: #ffffff;
+                    background-color: #2d2d2d;
                     border-color: #424242;
                     color: #ffffff;
                 }
