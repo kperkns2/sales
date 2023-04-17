@@ -278,7 +278,7 @@ class sales_chatbot(chatbot):
             status_bar_html += f"<div style='background-color: {status}; width: 20px; height: 20px; margin: 2px;'></div>"
         status_bar_html += "</div>"
 
-        st.markdown("<div> Here's your current status: " + status_bar_html + "</div>", unsafe_allow_html=True)
+        st.markdown("<div style='display: flex; flex-wrap: wrap;'> Here's your current status: " + status_bar_html + "</div>", unsafe_allow_html=True)
 
     def on_user_message(self, user_message):
         input_sentence = user_message
