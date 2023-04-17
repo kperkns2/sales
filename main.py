@@ -142,15 +142,6 @@ class chatbot():
     assistant_role = st.session_state[self.prefix + 'assistant_role']
     user_role = st.session_state[self.prefix + 'user_role']
 
-    pc = st.get_option('theme.primaryColor')
-    bc = st.get_option('theme.backgroundColor')
-    sbc = st.get_option('theme.secondaryBackgroundColor')
-    tc = st.get_option('theme.textColor')
-
-    st.write(pc, bc, sbc, tc)
-
-
-
     st.markdown(
         """
         <style>
@@ -161,15 +152,25 @@ class chatbot():
                 margin-bottom: 10px;
             }
             .user-message {
-                background-color: #000000;
-                color: #ffffff;
+                background-color: #ffffff;
+                color: #000000;
             }
             .assistant-message {
-                background-color: #2d2d2d;
+                background-color: #F7F7F7;
                 border: 1px solid #DDDDDD;
-                color: #ffffff;
+                color: #000000;
             }
-            
+            @media (prefers-color-scheme: dark) {
+                .user-message {
+                    background-color: #1f1f1f;
+                    color: #ffffff;
+                }
+                .assistant-message {
+                    background-color: #2d2d2d;
+                    border-color: #424242;
+                    color: #ffffff;
+                }
+            }
         </style>
         """,
         unsafe_allow_html=True,
