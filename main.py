@@ -362,9 +362,9 @@ st.session_state['script_lines'] = script_lines
 
 
 sales_chatbot(focus, first_message, prompt, prefix='activity_' )
-if st.button('Restart'):
-  clear_session_state()
-  st.experimental_rerun()
+#if st.button('Restart'):
+#  clear_session_state()
+#  st.experimental_rerun()
 
 
     
