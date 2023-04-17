@@ -360,6 +360,14 @@ df_script = get_sheet_as_dataframe(key='script')
 script_lines = df_script[subtopic].values.tolist()
 st.session_state['script_lines'] = script_lines
 
+if subtopic == 'Alarm'
+  st.write('The home owner has an alarm system.')
+if subtopic == 'NoAlarm'
+  st.write('The home owner does not have an alarm system.')
+
+
+
+
 
 sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 #if st.button('Restart'):
