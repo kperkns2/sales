@@ -295,8 +295,9 @@ class sales_chatbot(chatbot):
         similar_sentence_length = len(most_similar_sentence.split(' '))
 
         size_ratio = (len(input_sentence.split(' ')) / similar_sentence_length) 
-        if size_ratio < .9:
-            similarity_score = similarity_score * (size_ratio / .9) 
+        if size_ratio < .95:
+            penalty = ((size_ratio / .95)*.5) + .5
+            similarity_score = similarity_score * penalty
 
         if size_ratio > 1.1:
             input_embedding_shortened = fetch_embedding(' '.join(input_sentence.split(' ')[-(similar_sentence_length + 4):]))
