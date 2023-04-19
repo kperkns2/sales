@@ -356,25 +356,27 @@ df_activities = get_sheet_as_dataframe(key='prompts')
 df_activities = df_activities[df_activities['assignment_id'] == assignment_id].iloc[0]
 course,topic,subtopic,focus,prompt,first_message,assignment_id = df_activities
 df_script = get_sheet_as_dataframe(key='script')
-script_lines = df_script[subtopic].values.tolist()
-st.session_state['script_lines'] = script_lines
 
-if subtopic == 'Alarm':
-  st.write('The home owner has an alarm system.')
-if subtopic == 'NoAlarm':
-  st.write('The home owner does not have an alarm system.')
+
 
 
 
 
 if assignment_id in ['a0','a1','a2','a3']:
+  if subtopic == 'Alarm':
+    st.write('The home owner has an alarm system.')
+  if subtopic == 'NoAlarm':
+    st.write('The home owner does not have an alarm system.')
+
+  script_lines = df_script[subtopic].values.tolist()
+  st.session_state['script_lines'] = script_lines
   sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 
 if assignment_id == 'a5':
   chatbot(focus, first_message, prompt, prefix='activity_' )
 
 
-  
+
 #if st.button('Restart'):
 #  clear_session_state()
 #  st.experimental_rerun()
@@ -388,4 +390,4 @@ st.sidebar.markdown("[Without Alarm System](https://salesman.streamlit.app/?assi
 st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a3)")
 
 st.sidebar.subheader('Goal Creation')
-st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a5)")
+st.sidebar.markdown("[Brainstorm Subgoals](https://salesman.streamlit.app/?assignment_id=a5)")
