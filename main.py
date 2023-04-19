@@ -272,7 +272,6 @@ class sales_chatbot(chatbot):
           self.update_status_bar()
 
     def update_status_bar(self):
-        
         status_bar_html = "<div style='display: flex; flex-wrap: wrap;'>"
         for status in st.session_state['sentence_status']:
             status_bar_html += f"<div style='background-color: {status}; width: 20px; height: 20px; margin: 2px;'></div>"
@@ -368,8 +367,14 @@ if subtopic == 'NoAlarm':
 
 
 
+if assignment_id in ['a0','a1','a2','a3']:
+  sales_chatbot(focus, first_message, prompt, prefix='activity_' )
 
-sales_chatbot(focus, first_message, prompt, prefix='activity_' )
+if assignment_id == 'a5':
+  chatbot(focus, first_message, prompt, prefix='activity_' )
+
+
+  
 #if st.button('Restart'):
 #  clear_session_state()
 #  st.experimental_rerun()
@@ -381,4 +386,6 @@ st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignm
 st.sidebar.subheader('Hard Sales')
 st.sidebar.markdown("[Without Alarm System](https://salesman.streamlit.app/?assignment_id=a2)")
 st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a3)")
-    
+
+st.sidebar.subheader('Goal Creation')
+st.sidebar.markdown("[With Alarm System](https://salesman.streamlit.app/?assignment_id=a5)")
