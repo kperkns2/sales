@@ -370,7 +370,7 @@ if assignment_id in ['a0','a1','a2','a3']:
 
   script_lines = df_script[subtopic].values.tolist()
   st.session_state['script_lines'] = script_lines
-  sales_chatbot(focus, first_message, prompt, prefix='activity_' )
+  sales_chatbot(focus,False,first_message, prompt, prefix='activity_' )
 
 if assignment_id == 'a5':
   chatbot(focus, first_message, prompt, prefix='activity_' )
