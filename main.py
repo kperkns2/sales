@@ -317,7 +317,9 @@ class sales_chatbot(chatbot):
         #st.write(f"Input sentence: {input_sentence}")
         #st.write(f"Most similar sentence: {most_similar_sentence}")
         st.write(f"Similarity: {np.round(similarity_score*100)}")
-
+        
+    def on_agent_message(self, agent_message):
+      text_to_speech(agent_message)
   
 import streamlit as st
 import pandas as pd
