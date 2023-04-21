@@ -65,6 +65,7 @@ audio_webpage = """<!DOCTYPE html>
         // Receive the text from Streamlit and play the audio.
         window.addEventListener('message', (event) => {
             const text = event.data.text;
+            console.log("Received text from Streamlit:", text); 
             if (text) {
                 chatbotAudio.chatbotResponse(text);
             }
