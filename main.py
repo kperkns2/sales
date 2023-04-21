@@ -28,17 +28,78 @@ def clear_session_state():
   except:
     pass
 
-def get_audio_player(audio_data):
-    audio_base64 = base64.b64encode(audio_data).decode()
-    return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
+audio_webpage = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Audio</title>
+    <script>
+        class ChatbotAudio {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.utterance = new SpeechSynthesisUtterance();
+            }
+
+            playAudio(text) {
+                this.utterance.text = text;
+                speechSynthesis.speak(this.utterance);
+            }
+
+            chatbotResponse(responseText) {
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        this.playAudio(responseText);
+                    });
+                } else {
+                    this.playAudio(responseText);#
+                #}
+            #}
+        }#######
+
+        const chatbotAudio = new ChatbotAudio();
+    </script>
+</head>
+<body>
+    <script>
+        // Receive the text from Streamlit and play the audio.
+        window.addEventListener('message', (event) => {
+            const text = event.data.text;
+            if (text) {
+                chatbotAudio.chatbotResponse(text);
+            }
+        }, false);
+    </script>
+</body>
+</html>"""
+
+def serve_audio_player():
+    st.write(audio_webpage, unsafe_allow_html=True)
 
 def text_to_speech(text):
-    tts = gTTS(text=text, lang='en')
-    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
-        tts.save(tmp_file.name)
-        audio_data = open(tmp_file.name, "rb").read()
-    audio_player = get_audio_player(audio_data)
-    st.write(audio_player, unsafe_allow_html=True)
+    # Display the audio player if it hasn't been displayed yet.
+    if not hasattr(st.session_state, "audio_player_displayed"):
+        serve_audio_player()
+        st.session_state.audio_player_displayed = True
+
+    # Send the chatbot response text to the JavaScript code.
+    st.write(f'<script>window.parent.postMessage({{"text": "{text}"}}, "*");</script>', unsafe_allow_html=True)
+
+# Example usage:
+text_to_speech("Hello, I am your chatbot.")
+
+
+#def get_audio_player(audio_data):
+#    audio_base64 = base64.b64encode(audio_data).decode()
+#    return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
+
+#def text_to_speech(text):
+#    tts = gTTS(text=text, lang='en')
+#    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+#        tts.save(tmp_file.name)
+#        audio_data = open(tmp_file.name, "rb").read()
+#    audio_player = get_audio_player(audio_data)
+#    st.write(audio_player, unsafe_allow_html=True)
 
 
 class chatbot():
@@ -317,7 +378,7 @@ class sales_chatbot(chatbot):
         #st.write(f"Input sentence: {input_sentence}")
         #st.write(f"Most similar sentence: {most_similar_sentence}")
         st.write(f"Similarity: {np.round(similarity_score*100)}")
-        
+
     def on_agent_message(self, agent_message):
       text_to_speech(agent_message)
   
