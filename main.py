@@ -17,7 +17,7 @@ import requests
 import os
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-
+st.set_page_config(layout="wide",page_title="Mock Sale",page_icon="🤑")
 
 def clear_session_state():
   
@@ -86,7 +86,7 @@ def text_to_speech(text):
     st.write(f'<script>window.parent.postMessage({{"text": "{text}"}}, "*");</script>', unsafe_allow_html=True)
 
 # Example usage:
-text_to_speech("Hello, I am your chatbot.")
+# text_to_speech("Hello, I am your chatbot.")
 
 
 #def get_audio_player(audio_data):
@@ -388,7 +388,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json 
 #from chatbot import chatbot, chatbot_select
-st.set_page_config(layout="wide",page_title="Mock Sale",page_icon="🤑")
+
 
 # Set up credentials to access the Google Sheet
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
