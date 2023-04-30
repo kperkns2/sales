@@ -33,9 +33,22 @@ def clear_session_state():
 
 
 
-def get_audio_player(audio_data):
+#def get_audio_player(audio_data):
+#    audio_base64 = base64.b64encode(audio_data).decode()
+#    return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
+
+#def text_to_speech(text):
+#    tts = gTTS(text=text, lang='en')
+#    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+#        tts.save(tmp_file.name)
+#        audio_data = open(tmp_file.name, "rb").read()
+#    audio_player = get_audio_player(audio_data)
+#    st.write(audio_player, unsafe_allow_html=True)
+
+def get_audio_player(audio_data, autoplay=True, style="display:none"):
     audio_base64 = base64.b64encode(audio_data).decode()
-    return f'<audio autoplay style="display:none" controls src="data:audio/mp3;base64,{audio_base64}">'
+    autoplay_attr = "autoplay" if autoplay else ""
+    return f'<audio id="audio-element" {autoplay_attr} style="{style}" controls src="data:audio/mp3;base64,{audio_base64}">'
 
 def text_to_speech(text):
     tts = gTTS(text=text, lang='en')
@@ -61,7 +74,7 @@ if not st.session_state.audio_element_initialized:
     if st.button("Test Audio"):
         play_test_audio()
         st.session_state.audio_element_initialized = True
-        
+
 class chatbot():
   def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Tutor', user_role='Student', spreadsheet=None, assignment_id=None, assignment_name=None):
     self.spreadsheet = spreadsheet
