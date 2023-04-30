@@ -17,6 +17,8 @@ import requests
 import os
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from tempfile import NamedTemporaryFile
+
 st.set_page_config(layout="wide",page_title="Mock Sale",page_icon="🤑")
 
 def clear_session_state():
@@ -43,6 +45,17 @@ def text_to_speech(text):
     audio_player = get_audio_player(audio_data)
     st.write(audio_player, unsafe_allow_html=True)
 
+def play_test_audio():
+    tts = gTTS(text="This is a test audio.", lang='en')
+    with NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+        tts.save(tmp_file.name)
+        audio_data = open(tmp_file.name, "rb").read()
+    audio_player = get_audio_player(audio_data, autoplay=False, style="")
+    st.write(audio_player, unsafe_allow_html=True)
+
+# Create a session state for audio element if it doesn't exist
+if "audio_element_initialized" not in st.session_state:
+    st.session_state.audio_element_initialized = False
 
 class chatbot():
   def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Tutor', user_role='Student', spreadsheet=None, assignment_id=None, assignment_name=None):
