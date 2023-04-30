@@ -57,6 +57,11 @@ def play_test_audio():
 if "audio_element_initialized" not in st.session_state:
     st.session_state.audio_element_initialized = False
 
+if not st.session_state.audio_element_initialized:
+    if st.button("Test Audio"):
+        play_test_audio()
+        st.session_state.audio_element_initialized = True
+        
 class chatbot():
   def __init__(self, bool_focus, hard_focus, first_assistant_message, str_prompt, prefix='', replace={}, assistant_role='Tutor', user_role='Student', spreadsheet=None, assignment_id=None, assignment_name=None):
     self.spreadsheet = spreadsheet
