@@ -28,13 +28,13 @@ js_code = """
 
 if st.button("Speak"):
     # Call the speak function with the user input
-    js_code = f"""<script>
+    js_code = f""" <script>
             console.log("speak() called with:", {user_input});
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const utterance = new SpeechSynthesisUtterance({user_input});
             utterance.onstart = function (event) {{
                 audioContext.resume();
             }};
-            window.speechSynthesis.speak(utterance);</script>"""
+            window.speechSynthesis.speak(utterance);</script> """
     html(js_code)
     html(f"<script>speak('You said {user_input}')</script>")
