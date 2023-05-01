@@ -7,6 +7,7 @@ user_input = st.text_input("Enter your text:")
 js_code = """
 <script>
     function speak(text) {
+        console.log("speak() called with:", text);
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const utterance = new SpeechSynthesisUtterance(text);
 
