@@ -25,13 +25,13 @@ js_code = """
 
 js_code = """
   <script>
-          console.log("speak() called with:", {});
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const utterance = new SpeechSynthesisUtterance({});
-          utterance.onstart = function (event) {{
-              audioContext.resume();
-          }};
-          window.speechSynthesis.speak(utterance);
+  console.log("speak() called with:", {});
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const utterance = new SpeechSynthesisUtterance({});
+  utterance.onstart = function (event) {{
+  audioContext.resume();
+  }};
+  window.speechSynthesis.speak(utterance);
   </script>
   """
 
