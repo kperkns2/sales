@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("Text to Speech POC")
+st.title("-- Text to Speech POC --")
 
 user_input = st.text_input("Enter your text:")
 
