@@ -21,10 +21,8 @@ js_code = """
 </script>
 """
 
-
+html(js_code)
 
 if st.button("Speak"):
     # Call the speak function with the user input
-    html(f"<script>console.log('Hello world');</script>")
-    st.markdown(js_code, unsafe_allow_html=True)
-    st.markdown(f"<script>speak('You said {user_input}')</script>", unsafe_allow_html=True)
+    html(f"<script>speak('You said {user_input}')</script>")
