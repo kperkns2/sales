@@ -21,8 +21,9 @@ js_code = """
 </script>
 """
 
-html(js_code)
+
 
 if st.button("Speak"):
     # Call the speak function with the user input
+    html(js_code)
     html(f"<script>speak('You said {user_input}')</script>")
