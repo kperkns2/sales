@@ -23,21 +23,21 @@ js_code = """
 
 
 
-
-
-
-if st.button("Speak"):
-    # Call the speak function with the user input
-    js_code = f"""
+js_code = """
   <script>
-          console.log("speak() called with:", {user_input});
+          console.log("speak() called with:", {});
           const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const utterance = new SpeechSynthesisUtterance({user_input});
+          const utterance = new SpeechSynthesisUtterance({});
           utterance.onstart = function (event) {{
               audioContext.resume();
           }};
           window.speechSynthesis.speak(utterance);
   </script>
   """
-    html(js_code)
-    html(f"<script>speak('You said {user_input}')</script>")
+
+
+if st.button("Speak"):
+    # Call the speak function with the user input
+    
+    html(js_code.format(user_input,user_input))
+    #html(f"<script>speak('You said {user_input}')</script>")
