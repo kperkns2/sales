@@ -1,43 +1,22 @@
 import streamlit as st
 from streamlit.components.v1 import html
 
-st.title("-- Text to Speech POC --")
+st.title("Text to Speech POC")
 
 user_input = st.text_input("Enter your text:")
 
-js_code = """
-<script>
-    function speak(text) {
-        console.log("speak() called with:", text);
+if st.button("Speak"):
+    js_code = f"""
+    <script>
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance("You said {user_input}");
 
-        utterance.onstart = function (event) {
+        utterance.onstart = function (event) {{
             audioContext.resume();
-        };
+        }};
 
         window.speechSynthesis.speak(utterance);
-    }
-</script>
+    </script>
+    """
 
-
-
-
-js_code = """
-  <script>
-  console.log("speak() called with:", {});
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const utterance = new SpeechSynthesisUtterance({});
-  utterance.onstart = function (event) {{
-  audioContext.resume();
-  }};
-  window.speechSynthesis.speak(utterance);
-  </script>
-  """
-
-
-if st.button("Speak"):
-    # Call the speak function with the user input
-    
-    html(js_code.format(user_input,user_input))
-    #html(f"<script>speak('You said {user_input}')</script>")
+    html(js_code, height=0)
