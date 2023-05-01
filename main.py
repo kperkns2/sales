@@ -20,9 +20,9 @@ js_code = """
 </script>
 """
 
-st.write(js_code, unsafe_allow_html=True)
+
 
 if st.button("Speak"):
     # Call the speak function with the user input
-
+    st.markdown(js_code, unsafe_allow_html=True)
     st.markdown(f"<script>speak('You said {user_input}')</script>", unsafe_allow_html=True)
